@@ -1,6 +1,6 @@
 {
     "bids": "input/bids",
-    "input_app_1": "input/derivatives",
+    "app1_output": "input/derivatives",
     "sessions": "all",
     "runs": "all",
     "process_empty_room": false,
@@ -46,7 +46,8 @@
     
     "l_freq": 1.0,
     "h_freq": 40.0,
-    "l_trans_bandwidth": null,
+    "l_trans_bandwidth": "auto",
+    "h_trans_bandwidth": "auto",
     "notch_freq": null,
     "notch_trans_bandwidth": null,
     "notch_widths": null,

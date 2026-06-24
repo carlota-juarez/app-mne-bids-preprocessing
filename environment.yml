@@ -1,4 +1,4 @@
-name: app-mne-bids-init
+name: app-mne-bids-preprocessing
 channels:
   - conda-forge
   - defaults

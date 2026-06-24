@@ -33,10 +33,10 @@ if not os.path.exists(deriv_root):
 if not os.path.exists(html_report_dir):
     os.makedirs(html_report_dir)
 
-# Copy the input folder ('output') in the output folder ('out_dir') to have all the data there
+# Copy the input folder ('app1_output') in the output folder ('out_dir') to have all the data there
 
-if config['input_app1'] and os.path.exists(config['input_app1']):
-    copy_tree(config['input_app1'], deriv_root)
+if config['app1_output'] and os.path.exists(config['app1_output']):
+    copy_tree(config['app1_output'], deriv_root)
 
 # Rewrite the info in the .json file into a .py file
 
@@ -156,14 +156,14 @@ with open(file_name, 'w') as f:
     if config['l_trans_bandwidth']:
         f.write(f"l_trans_bandwidth = {config['l_trans_bandwidth']}\n")
 
+    if config['h_trans_bandwidth']:
+        f.write(f"h_trans_bandwidth = {config['h_trans_bandwidth']}\n")
+
     if config['notch_freq']:
         f.write(f"notch_freq = {config['notch_freq']}\n")
 
     if config['notch_trans_bandwidth']:
         f.write(f"notch_trans_bandwidth = {config['notch_trans_bandwidth']}\n")
-
-    if config['h_fnotch_widths']:
-        f.write(f"notch_widths = {config['notch_widths']}\n")
 
     if config['notch_widths']:
         f.write(f"notch_widths = {config['notch_widths']}\n")
@@ -342,7 +342,7 @@ with open(file_name, 'w') as f:
 
 # Run python script
 
-command = ["mne_bids_pipeline", f"--config={file_name}", "--steps=preprocessing"]
+command = ["mne_bids_pipeline", f"--config={file_name}", "--steps=preprocessing,report"]
 
 try:
     subprocess.run(command, check=True)

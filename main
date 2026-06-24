@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#make output directory
+# Make output directory
 mkdir -p out_dir
+mkdir -p html_report
 
 #python main.py
 singularity exec --bind /:/ docker://mnetools/mne-bids-pipeline:1.4.0 python3 main.py
