@@ -5,4 +5,4 @@ mkdir -p out_dir
 mkdir -p html_report
 
 #python main.py
-singularity exec --bind /:/ docker://mne_tools/mne-bids-pipeline:latest python3 main.py
+singularity exec --bind /:/ docker://mneot/mne-bids-pipeline:latest python3 main.py
