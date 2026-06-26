@@ -1,8 +1,9 @@
 #!/bin/bash
+set -e
 
 # Make output directory
 mkdir -p out_dir
 mkdir -p html_report
 
 #python main.py
-singularity exec --bind /:/ docker://ghcr.io/mne-tools/mne-bids-pipeline:latest python3 main.py
+singularity exec -e docker://ghcr.io/carlota-juarez/app-mne-bids-preprocessing:latest python3 ./main.py
