@@ -1,17 +1,26 @@
 FROM python:3.11-slim
- 
-ENV DEBIAN_FRONTEND=noninteractive
- 
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    QT_QPA_PLATFORM=offscreen \
+    MNE_BROWSER_BACKEND=matplotlib \
+    MPLBACKEND=Agg
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         libgl1 \
         libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-RUN pip install --no-cache-dir mne-bids-pipeline==1.10.1
+RUN pip install --no-cache-dir mne-bids-pipeline==1.10.1 \
+    && find /usr/local/lib/python3.11 -type d -name "__pycache__" -exec rm -rf {} + \
+    && find /usr/local/lib/python3.11 -type d \( -name "tests" -o -name "test" \) -exec rm -rf {} + \
+    && rm -rf /root/.cache
  
 WORKDIR /work
- 
+
 RUN rm -f /bin/sh && ln -s /bin/bash /bin/sh
- 
+
 RUN ldconfig
