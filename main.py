@@ -118,7 +118,7 @@ with open(file_name, 'w') as f:
         f.write(f"t_break_annot_stop_before_next_event = {t_break_annot_stop_before_next_event}\n")
 
     # Bad channel detection for MEG
-'''
+    '''
     find_flat_channels_meg = config.get('find_flat_channels_meg', False)
     f.write(f"find_flat_channels_meg = {find_flat_channels_meg}\n")
     
@@ -128,10 +128,10 @@ with open(file_name, 'w') as f:
     find_bad_channels_extra_kws = config.get('find_bad_channels_extra_kws', {})
     if find_bad_channels_extra_kws:
         f.write(f"find_bad_channels_extra_kws = {find_bad_channels_extra_kws}\n")
-'''
+    '''
 
     # Maxwell filter for MEG
-'''
+    '''
     use_maxwell_filter = config.get('use_maxwell_filter', False)
     f.write(f"use_maxwell_filter = {use_maxwell_filter}\n")
     if use_maxwell_filter:
@@ -235,7 +235,7 @@ with open(file_name, 'w') as f:
         mf_extra_kws = config.get('mf_extra_kws', {})
         if mf_extra_kws:
             f.write(f"mf_extra_kws = {mf_extra_kws}\n")
-'''
+    '''
 
     # Filtering and resampling
 
@@ -414,11 +414,11 @@ with open(file_name, 'w') as f:
     eog_proj_from_average = config.get('eog_proj_from_average', True)
     f.write(f"eog_proj_from_average = {eog_proj_from_average}\n")
 
-'''
+    '''
     ssp_meg = config.get('ssp_meg', 'auto')
     if ssp_meg:
             f.write(f"ssp_meg = '{ssp_meg}'\n")
-'''
+    '''
   
     ssp_reject_ecg = config.get('ssp_reject_ecg', None)
     if ssp_reject_ecg:
