@@ -55,10 +55,12 @@ raw = mne.io.read_raw_edf(fname, preload = False)
 # configuracion de variables BIDS 
 
 subject = '001'
-task = '01'
+#task
 datatype = 'eeg'
 #session
 #run
+task = config.get('task')
+
 
 #bids_path es el archivo de un solo paciente 
 bids_path = mne_bids.BIDSPath(subject = subject, task = task, datatype = datatype, root = bids_root_path)
