@@ -499,7 +499,7 @@ with open(file_name, 'w') as f:
     if rest_epochs_overlap:
         f.write(f"rest_epochs_overlap = {rest_epochs_overlap}\n")
 
-    baseline = config.get('baseline', [null, 0])
+    baseline = config.get('baseline', (None, 0))
     if baseline:
         f.write(f"baseline = {baseline}\n")
 
