@@ -73,7 +73,7 @@
   "ica_h_freq": null,
   "ica_max_iterations": 500,
   "ica_n_components": null,
-  "ica_decim": null,
+  "ica_decim": 10,
   "ica_use_ecg_detection": true,
   "ica_ecg_threshold": 0.1,
   "ica_use_eog_detection": true,
