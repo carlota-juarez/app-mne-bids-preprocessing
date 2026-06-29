@@ -507,12 +507,14 @@ with open(file_name, 'w') as f:
 
     baseline = config.get('baseline', (None, 0))
     if baseline:
-        if baseline[0] in [None, 'null']:
+        if baseline[0] in [None, 'null', '']:
             p1 = None
         else:
             p1 = baseline[0]
         p2 = baseline[1]
         f.write(f"baseline = ({p1}, {p2})\n")
+    else:
+        f.write("baseline = (None, 0)\n")
 
     # Artifact removal
 
