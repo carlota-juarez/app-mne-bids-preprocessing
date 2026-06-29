@@ -386,11 +386,17 @@ with open(file_name, 'w') as f:
     
     l_trans_bandwidth = config.get('l_trans_bandwidth', 'auto')
     if l_trans_bandwidth:
-        f.write(f"l_trans_bandwidth = {l_trans_bandwidth}\n")
+        if isinstance(l_trans_bandwidth, str):
+            f.write(f"l_trans_bandwidth = '{l_trans_bandwidth}'\n")
+        else:
+            f.write(f"l_trans_bandwidth = {l_trans_bandwidth}\n")
 
     h_trans_bandwidth = config.get('h_trans_bandwidth', 'auto')
     if h_trans_bandwidth:
-        f.write(f"h_trans_bandwidth = {h_trans_bandwidth}\n")
+        if isinstance(h_trans_bandwidth, str):
+            f.write(f"h_trans_bandwidth = '{h_trans_bandwidth}'\n")
+        else:
+            f.write(f"h_trans_bandwidth = {h_trans_bandwidth}\n")
 
     notch_freq = config.get('notch_freq', None)
     if notch_freq:
@@ -501,7 +507,12 @@ with open(file_name, 'w') as f:
 
     baseline = config.get('baseline', (None, 0))
     if baseline:
-        f.write(f"baseline = {baseline}\n")
+        if baseline[0] in [None, 'null']:
+            p1 = None
+        else:
+            p1 = baseline[0]
+        p2 = baseline[1]
+        f.write(f"baseline = ({p1}, {p2})\n")
 
     # Artifact removal
 
