@@ -200,7 +200,8 @@ with open(file_name, 'w') as f:
         f.write(f"eeg_reference = '{eeg_reference}'\n")
 
     eeg_template_montage = config.get('eeg_template_montage', None)
-    f.write(f"eeg_template_montage = {eeg_template_montage}\n")
+    if eeg_template_montage:
+        f.write(f"eeg_template_montage = '{eeg_template_montage}'\n")
 
     drop_channels = config.get('drop_channels', [])
     if drop_channels:
@@ -398,7 +399,8 @@ with open(file_name, 'w') as f:
     notch_trans_bandwidth = config.get('notch_trans_bandwidth')
     if notch_trans_bandwidth in [None, ""]:
         notch_trans_bandwidth = 1.0
-    f.write(f"notch_trans_bandwidth = {notch_trans_bandwidth}\n")
+    if notch_trans_bandwidth:
+        f.write(f"notch_trans_bandwidth = {notch_trans_bandwidth}\n")
 
     notch_widths = config.get('notch_widths', None)
     if notch_widths:
@@ -426,7 +428,8 @@ with open(file_name, 'w') as f:
     epochs_decim = config.get('epochs_decim')
     if epochs_decim in [None, ""]:
         epochs_decim = 1
-    f.write(f"epochs_decim = {epochs_decim}\n")
+    if epochs_decim:
+        f.write(f"epochs_decim = {epochs_decim}\n")
     
     # Epoching
 
@@ -479,12 +482,14 @@ with open(file_name, 'w') as f:
     epochs_tmin = config.get('epochs_tmin')
     if epochs_tmin in [None, ""]:
         epochs_tmin = -0.2
-    f.write(f"epochs_tmin = {epochs_tmin}\n")
+    if epochs_tmin:
+        f.write(f"epochs_tmin = {epochs_tmin}\n")
 
     epochs_tmax = config.get('epochs_tmax')
     if epochs_tmax in [None, ""]:
         epochs_tmax = 0.5
-    f.write(f"epochs_tmax = {epochs_tmax}\n")
+    if epochs_tmax:
+        f.write(f"epochs_tmax = {epochs_tmax}\n")
 
     rest_epochs_duration = config.get('rest_epochs_duration', None)
     if rest_epochs_duration:
@@ -494,7 +499,7 @@ with open(file_name, 'w') as f:
     if rest_epochs_overlap:
         f.write(f"rest_epochs_overlap = {rest_epochs_overlap}\n")
 
-    baseline = config.get('baseline', (None, 0))
+    baseline = config.get('baseline', [null, 0])
     if baseline:
         f.write(f"baseline = {baseline}\n")
 
@@ -591,7 +596,8 @@ with open(file_name, 'w') as f:
     ica_l_freq = config.get('ica_l_freq')
     if ica_l_freq in [None, ""]:
         ica_l_freq = 1.0
-    f.write(f"ica_l_freq = {ica_l_freq}\n")
+    if ica_l_freq:
+        f.write(f"ica_l_freq = {ica_l_freq}\n")
 
     ica_h_freq = config.get('ica_h_freq')
     if ica_h_freq:
@@ -600,7 +606,8 @@ with open(file_name, 'w') as f:
     ica_max_iterations = config.get('ica_max_iterations')
     if ica_max_iterations in [None, ""]:
         ica_max_iterations = 500
-    f.write(f"ica_max_iterations = {ica_max_iterations}\n")
+    if ica_max_iterations:
+        f.write(f"ica_max_iterations = {ica_max_iterations}\n")
 
     ica_n_components = config.get('ica_n_components', None)
     if ica_n_components:
@@ -616,7 +623,8 @@ with open(file_name, 'w') as f:
     ica_ecg_threshold = config.get('ica_ecg_threshold')
     if ica_ecg_threshold in [None, ""]:
         ica_ecg_threshold = 0.1
-    f.write(f"ica_ecg_threshold = {ica_ecg_threshold}\n")
+    if ica_ecg_threshold:
+        f.write(f"ica_ecg_threshold = {ica_ecg_threshold}\n")
 
     ica_use_eog_detection = config.get('ica_use_eog_detection', True)
     f.write(f"ica_use_eog_detection = {ica_use_eog_detection}\n")
@@ -624,7 +632,8 @@ with open(file_name, 'w') as f:
     ica_eog_threshold = config.get('ica_eog_threshold')
     if ica_eog_threshold in [None, ""]:
         ica_eog_threshold = 3.0
-    f.write(f"ica_eog_threshold = {ica_eog_threshold}\n")
+    if ica_ecg_threshold:
+        f.write(f"ica_eog_threshold = {ica_eog_threshold}\n")
 
     ica_use_icalabel = config.get('ica_use_icalabel', False)
     f.write(f"ica_use_icalabel = {ica_use_icalabel}\n")
