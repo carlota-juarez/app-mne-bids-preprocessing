@@ -673,7 +673,7 @@ with open(file_name, 'w') as f:
 
 # Run python script
 
-command = ["python3", "-m", "mne_bids_pipeline", f"--config={file_name}", "--steps=init,preprocessing,report"]
+command = ["mne_bids_pipeline", f"--config={file_name}", "--steps=init,preprocessing,report"]
 
 try:
     subprocess.run(command, check=True)
