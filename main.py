@@ -501,6 +501,8 @@ with open(file_name, 'w') as f:
         f.write(f"epochs_tmax = {epochs_tmax}\n")
 
     rest_epochs_duration = config.get('rest_epochs_duration', None)
+    if rest_epochs_duration in [None, ""] and task_is_rest:
+        rest_epochs_duration = 2.0
     if rest_epochs_duration:
         f.write(f"rest_epochs_duration = {rest_epochs_duration}\n")
 
