@@ -490,9 +490,11 @@ with open(file_name, 'w') as f:
 
     epochs_tmin = config.get('epochs_tmin')
     if epochs_tmin in [None, ""]:
-        epochs_tmin = -0.2
-    if epochs_tmin:
-        f.write(f"epochs_tmin = {epochs_tmin}\n")
+        if task_is_rest:
+            epochs_tmin = 0.0
+        else:
+            epochs_tmin = -0.2
+    f.write(f"epochs_tmin = {epochs_tmin}\n")
 
     epochs_tmax = config.get('epochs_tmax')
     if epochs_tmax in [None, ""]:
