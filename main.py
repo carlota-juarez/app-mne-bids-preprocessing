@@ -59,6 +59,7 @@ subject = '001'
 datatype = 'eeg'
 #session
 #run
+# if task different from rest, conditions must be filled with some values
 task = config.get('task')
 
 

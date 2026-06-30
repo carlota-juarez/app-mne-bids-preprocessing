@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write   # <- imprescindible para poder publicar en ghcr.io
+      packages: write   #imprescindible para poder publicar en ghcr.io
 
     steps:
       - name: Checkout repo
@@ -27,4 +27,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/carlota-juarez/app-mne-bids-preprocessing:latest
+          tags: ghcr.io/carlota-juarez/app-mne-bids:lite
