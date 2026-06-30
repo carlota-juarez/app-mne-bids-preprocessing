@@ -509,8 +509,9 @@ with open(file_name, 'w') as f:
         f.write(f"rest_epochs_duration = {rest_epochs_duration}\n")
 
     rest_epochs_overlap = config.get('rest_epochs_overlap', None)
-    if rest_epochs_overlap:
-        f.write(f"rest_epochs_overlap = {rest_epochs_overlap}\n")
+    if rest_epochs_overlap in  [None, ""] and task_is_rest:
+        rest_epochs_overlap = 0.0
+    f.write(f"rest_epochs_overlap = {rest_epochs_overlap}\n")
 
     baseline = config.get('baseline')
     if isinstance(baseline, list) and len(baseline) == 2:
