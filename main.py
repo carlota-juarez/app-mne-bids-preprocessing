@@ -61,10 +61,10 @@ datatype = 'eeg'
 #run
 # if task different from rest, conditions must be filled with some values
 task = config.get('task')
-
+run = '01' #tenemos que forzar un run = '01' en el nombre del archivo 
 
 #bids_path es el archivo de un solo paciente 
-bids_path = mne_bids.BIDSPath(subject = subject, task = task, datatype = datatype, root = bids_root_path)
+bids_path = mne_bids.BIDSPath(subject = subject, task = task, run = run, datatype = datatype, root = bids_root_path)
 
 #escribimos los datos en formato bids
 mne_bids.write_raw_bids(raw, bids_path, overwrite = True)
