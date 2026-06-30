@@ -408,8 +408,7 @@ with open(file_name, 'w') as f:
     notch_trans_bandwidth = config.get('notch_trans_bandwidth')
     if notch_trans_bandwidth in [None, ""]:
         notch_trans_bandwidth = 1.0
-    if notch_trans_bandwidth:
-        f.write(f"notch_trans_bandwidth = {notch_trans_bandwidth}\n")
+    f.write(f"notch_trans_bandwidth = {notch_trans_bandwidth}\n")
 
     notch_widths = config.get('notch_widths', None)
     if notch_widths:
@@ -437,8 +436,7 @@ with open(file_name, 'w') as f:
     epochs_decim = config.get('epochs_decim')
     if epochs_decim in [None, ""]:
         epochs_decim = 1
-    if epochs_decim:
-        f.write(f"epochs_decim = {epochs_decim}\n")
+    f.write(f"epochs_decim = {epochs_decim}\n")
     
     # Epoching
 
@@ -521,6 +519,8 @@ with open(file_name, 'w') as f:
             p1 = baseline[0]
         p2 = baseline[1]
         f.write(f"baseline = ({p1}, {p2})\n")
+    elif task_is_rest:
+        f.write("baseline = None\n")
     else:
         f.write("baseline = (None, 0)\n")
 
@@ -617,8 +617,7 @@ with open(file_name, 'w') as f:
     ica_l_freq = config.get('ica_l_freq')
     if ica_l_freq in [None, ""]:
         ica_l_freq = 1.0
-    if ica_l_freq:
-        f.write(f"ica_l_freq = {ica_l_freq}\n")
+    f.write(f"ica_l_freq = {ica_l_freq}\n")
 
     ica_h_freq = config.get('ica_h_freq')
     if ica_h_freq:
@@ -627,8 +626,7 @@ with open(file_name, 'w') as f:
     ica_max_iterations = config.get('ica_max_iterations')
     if ica_max_iterations in [None, ""]:
         ica_max_iterations = 500
-    if ica_max_iterations:
-        f.write(f"ica_max_iterations = {ica_max_iterations}\n")
+    f.write(f"ica_max_iterations = {ica_max_iterations}\n")
 
     ica_n_components = config.get('ica_n_components', None)
     if ica_n_components:
@@ -644,8 +642,7 @@ with open(file_name, 'w') as f:
     ica_ecg_threshold = config.get('ica_ecg_threshold')
     if ica_ecg_threshold in [None, ""]:
         ica_ecg_threshold = 0.1
-    if ica_ecg_threshold:
-        f.write(f"ica_ecg_threshold = {ica_ecg_threshold}\n")
+    f.write(f"ica_ecg_threshold = {ica_ecg_threshold}\n")
 
     ica_use_eog_detection = config.get('ica_use_eog_detection', True)
     f.write(f"ica_use_eog_detection = {ica_use_eog_detection}\n")
@@ -653,7 +650,7 @@ with open(file_name, 'w') as f:
     ica_eog_threshold = config.get('ica_eog_threshold')
     if ica_eog_threshold in [None, ""]:
         ica_eog_threshold = 3.0
-    if ica_ecg_threshold:
+    if ica_eog_threshold:
         f.write(f"ica_eog_threshold = {ica_eog_threshold}\n")
 
     ica_use_icalabel = config.get('ica_use_icalabel', False)
@@ -681,11 +678,11 @@ with open(file_name, 'w') as f:
             f.write(f"reject = {reject}\n")
 
     reject_tmin = config.get('reject_tmin', None)
-    if reject_tmin:
+    if reject_tmin not in [None, ""]:
         f.write(f"reject_tmin = {reject_tmin}\n")
 
     reject_tmax = config.get('reject_tmax', None)
-    if reject_tmax:
+    if reject_tmax not in [None, ""]:
         f.write(f"reject_tmax = {reject_tmax}\n")
 
     autoreject_n_interpolate = config.get('autoreject_n_interpolate')
