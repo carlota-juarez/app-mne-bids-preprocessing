@@ -1,5 +1,5 @@
 {
-  "edf": "tu_archivo_prueba.edf",
+  "edf": "archivo_prueba.edf",
   "task": "01",
   "data_type": "eeg",
   "subjects_dir": null,
