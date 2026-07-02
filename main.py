@@ -41,12 +41,12 @@ with open (config_path, 'r') as f:
 edf = config.get('edf')
 fif = config.get('fif')
 
-if fname:
-    logger.info("Input edf file succesfully detected")
+if edf:
+    logger.info("Input .edf file succesfully detected")
     data_type = 'eeg'
     fname = edf
-elif fname2:
-    logger.info("Input fif file succesfully detected")
+elif fif:
+    logger.info("Input .fif file succesfully detected")
     data_type = 'meg'
     fname = fif
 else:
@@ -103,25 +103,20 @@ with open(file_name, 'w') as f:
 
     f.write(f"bids_root = '{bids_root_path}'\n")
     f.write(f"deriv_root = '{deriv_root}'\n")
+    f.write(f"subjects = ['{subject}']\n")
 
     # Depends on whether it is EEG or MEG 
-    # si uso eeg solo ch_types eeg
     # le doy al usuario la psoibilidad de elegir grad o mag si usa meg, por defecto ambos con meg
     if data_type == 'eeg':
         ch_types = ['eeg']
     else:
-        meg_ch_types = config.get('meg_ch_types', ['meg'])
-        ch_types = meg_ch_types
-    
+        meg_ch_types = config.get('meg_ch_types', 'meg')
+        ch_types = [meg_ch_types]
     f.write(f"ch_types = {ch_types}\n")
     
     # General settings
 
     # ---Common parameters for both EEG and MEG---
-
-    subjects_dir = config.get('subjects_dir', None)
-    if subjects_dir:
-        f.write(f"subjects_dir = '{subjects_dir}'\n")
 
     '''
     sessions = config.get('sessions', 'all')
@@ -138,6 +133,17 @@ with open(file_name, 'w') as f:
     task = config.get('task', None)
     if task:
         f.write(f"task = '{task}'\n")
+    else:
+        raise ValueError("'task' parameter is required")  
+
+    task_is_rest = config.get('task_is_rest', False)
+    f.write(f"task_is_rest = {task_is_rest}\n")
+
+    conditions = config.get('conditions', None)
+    if conditions:
+        f.write(f"conditions = {conditions}\n")
+    else:
+        raise ValueError("'conditions' parameter is required unless task_is_rest is True")
 
     '''
     runs = config.get('runs', 'all')
@@ -360,10 +366,6 @@ with open(file_name, 'w') as f:
     epochs_metadata_query = config.get('epochs_metadata_query', None)
     if epochs_metadata_query:
         f.write(f"epochs_metadata_query = '{epochs_metadata_query}'\n")
-    
-    conditions = config.get('conditions', None)
-    if conditions:
-        f.write(f"conditions = {conditions}\n")
 
     epochs_tmin = config.get('epochs_tmin')
     if epochs_tmin in [None, ""]:
@@ -712,7 +714,7 @@ with open(file_name, 'w') as f:
 
         process_empty_room = config.get('process_empty_room', False)
         f.write(f"process_empty_room = {process_empty_room}\n")
-        
+
         ssp_meg = config.get('ssp_meg', 'auto')
         if ssp_meg:
             f.write(f"ssp_meg = '{ssp_meg}'\n")
