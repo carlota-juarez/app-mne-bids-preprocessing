@@ -32,14 +32,25 @@ with open (config_path, 'r') as f:
 
 
 #DE PRUEBA
-#-- pasar de .edf o .fif de los datos que le mando a estructura bids--
+# --pasar de .edf o .fif de los datos que le mando a estructura bids--
 
 #read folders with mne-python
 # for MEG: .fif and for EEG: .edf
 
-fname = config.get('input')
+#si queremos que pueda procesar tanto datos eeg como meg, cogemos el darto elegido por el usuario en la interfaz de brainlife
+edf = config.get('edf')
+fif = config.get('fif')
+
 if fname:
-    logger.info("Input file succesfully detected")
+    logger.info("Input edf file succesfully detected")
+    data_type = 'eeg'
+    fname = edf
+elif fname2:
+    logger.info("Input fif file succesfully detected")
+    data_type = 'meg'
+    fname = fif
+else:
+    raise ValueError("An input file must be selected: 'edf' (EEG) or 'fif' (MEG)")
 
 #ruta de la carpeta BIDS a crear, carpeta principal del proyecto
 bids_root_path = __location__/'bids_input'
@@ -58,9 +69,7 @@ subject = '001'
 #task
 # CAMBIOS PENDIENTES
 #en brainlife: añadir parámetro data_type y ch_type, cambiar edf por input en los inputs
-#si queremos que pueda procesar tanto datos eeg como meg, cogemos el darto elegido por el usuario en la interfaz de brainlife
-data_type = config.get('data_type')
-#datatype = 'eeg'
+
 #session
 #run
 # if task different from rest, conditions must be filled with some values
@@ -73,14 +82,6 @@ bids_path = mne_bids.BIDSPath(subject = subject, task = task, run = run, datatyp
 #escribimos los datos en formato bids
 mne_bids.write_raw_bids(raw, bids_path, overwrite = True)
 logger.info("BIDS structure successfully created")
-
-
-# EEG study
-'''
-ch_types = ['eeg']
-if not ch_types:
-    raise ValueError("The 'ch_types' parameter is required")
-'''
 
 # Output paths
 
@@ -103,12 +104,18 @@ with open(file_name, 'w') as f:
     f.write(f"bids_root = '{bids_root_path}'\n")
     f.write(f"deriv_root = '{deriv_root}'\n")
 
-    # General settings
-
     # Depends on whether it is EEG or MEG 
-    ch_types = config.get('ch_types', [])
-    if ch_types:
-        f.write(f"ch_types = {ch_types}\n")
+    # si uso eeg solo ch_types eeg
+    # le doy al usuario la psoibilidad de elegir grad o mag si usa meg, por defecto ambos con meg
+    if data_type == 'eeg':
+        ch_types = ['eeg']
+    else:
+        meg_ch_types = config.get('meg_ch_types', ['meg'])
+        ch_types = meg_ch_types
+    
+    f.write(f"ch_types = {ch_types}\n")
+    
+    # General settings
 
     # ---Common parameters for both EEG and MEG---
 
@@ -444,12 +451,6 @@ with open(file_name, 'w') as f:
 
     eog_proj_from_average = config.get('eog_proj_from_average', True)
     f.write(f"eog_proj_from_average = {eog_proj_from_average}\n")
-
-    '''
-    ssp_meg = config.get('ssp_meg', 'auto')
-    if ssp_meg:
-            f.write(f"ssp_meg = '{ssp_meg}'\n")
-    '''
   
     ssp_reject_ecg = config.get('ssp_reject_ecg', None)
     if ssp_reject_ecg:
@@ -582,8 +583,6 @@ with open(file_name, 'w') as f:
 
     else:
         # --- exclusive parameters for MEG---
-        process_empty_room = config.get('process_empty_room', False)
-        f.write(f"process_empty_room = {process_empty_room}\n")
 
         # Bad channel detection for MEG
 
@@ -619,7 +618,11 @@ with open(file_name, 'w') as f:
                 else:
                     f.write(f"mf_head_origin = {mf_head_origin}\n")
                     
-            mf_destination = config.get('mf_destination', 'reference_run')
+            destination_file = config.get('destination', None)
+            if destination_file:
+                mf_destination = destination_file
+            else:
+                mf_destination = config.get('mf_destination', 'reference_run')
             if mf_destination:
                 if isinstance(mf_destination, str):
                     f.write(f"mf_destination = '{mf_destination}'\n")
@@ -644,7 +647,7 @@ with open(file_name, 'w') as f:
             if mf_reference_task:
                 f.write(f"mf_reference_task = '{mf_reference_task}'\n")
                 
-            mf_cal_fname = config.get('mf_cal_fname', None)
+            mf_cal_fname = config.get('calibration', None)
             if mf_cal_fname:
                 f.write(f"mf_cal_fname = '{mf_cal_fname}'\n")
                 
@@ -652,7 +655,7 @@ with open(file_name, 'w') as f:
             if mf_cal_missing:
                 f.write(f"mf_cal_missing = '{mf_cal_missing}'\n")
                 
-            mf_ctc_fname = config.get('mf_ctc_fname', None)
+            mf_ctc_fname = config.get('crosstalk', None)
             if mf_ctc_fname:
                 f.write(f"mf_ctc_fname = '{mf_ctc_fname}'\n")
                 
@@ -706,6 +709,13 @@ with open(file_name, 'w') as f:
         # SSP projections for eog and ecg artifacts for MEG
         f.write("n_proj_eog = {'n_mag': 1, 'n_grad': 1}\n")
         f.write("n_proj_ecg = {'n_mag': 1, 'n_grad': 1}\n")
+
+        process_empty_room = config.get('process_empty_room', False)
+        f.write(f"process_empty_room = {process_empty_room}\n")
+        
+        ssp_meg = config.get('ssp_meg', 'auto')
+        if ssp_meg:
+            f.write(f"ssp_meg = '{ssp_meg}'\n")
 
 # Run python script
 

@@ -1,8 +1,8 @@
 {
-  "input": "archivo_prueba",
+  "edf": "archivo_prueba.edf",
+  "fif": "archivo_prueba.fif",
   "task": "01",
-  "data_type": "",
-  "ch_type": "",
+  "meg_ch_type": "",
   "subjects_dir": null,
   "task_is_rest": false,
   "interactive": false,
