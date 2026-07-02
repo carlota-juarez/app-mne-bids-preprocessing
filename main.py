@@ -32,14 +32,14 @@ with open (config_path, 'r') as f:
 
 
 #DE PRUEBA
-#-- pasar de .edf de los datos que le mando a estructura bids--
+#-- pasar de .edf o .fif de los datos que le mando a estructura bids--
 
 #read folders with mne-python
 # for MEG: .fif and for EEG: .edf
 
-fname = config.get('edf')
+fname = config.get('input')
 if fname:
-    logger.info(".edf file succesfully detected")
+    logger.info("Input file succesfully detected")
 
 #ruta de la carpeta BIDS a crear, carpeta principal del proyecto
 bids_root_path = __location__/'bids_input'
@@ -49,14 +49,18 @@ if bids_root_path.exists():
     rmtree(bids_root_path)
 bids_root_path.mkdir(parents = True, exist_ok = True)
 
-#leemos el archivo
-raw = mne.io.read_raw_edf(fname, preload = False)
+#leemos el archivo, mne autodetecta si es .edf o .fif 
+raw = mne.io.read_raw(fname, preload = False)
 
 # configuracion de variables BIDS 
 
 subject = '001'
 #task
-datatype = 'eeg'
+# CAMBIOS PENDIENTES
+#en brainlife: añadir parámetro data_type y ch_type, cambiar edf por input en los inputs
+#si queremos que pueda procesar tanto datos eeg como meg, cogemos el darto elegido por el usuario en la interfaz de brainlife
+data_type = config.get('data_type')
+#datatype = 'eeg'
 #session
 #run
 # if task different from rest, conditions must be filled with some values
@@ -64,7 +68,7 @@ task = config.get('task')
 run = '01' #tenemos que forzar un run = '01' en el nombre del archivo 
 
 #bids_path es el archivo de un solo paciente 
-bids_path = mne_bids.BIDSPath(subject = subject, task = task, run = run, datatype = datatype, root = bids_root_path)
+bids_path = mne_bids.BIDSPath(subject = subject, task = task, run = run, datatype = data_type, root = bids_root_path)
 
 #escribimos los datos en formato bids
 mne_bids.write_raw_bids(raw, bids_path, overwrite = True)
@@ -98,9 +102,15 @@ with open(file_name, 'w') as f:
 
     f.write(f"bids_root = '{bids_root_path}'\n")
     f.write(f"deriv_root = '{deriv_root}'\n")
-    f.write(f"ch_types = ['eeg']\n")
 
     # General settings
+
+    # Depends on whether it is EEG or MEG 
+    ch_types = config.get('ch_types', [])
+    if ch_types:
+        f.write(f"ch_types = {ch_types}\n")
+
+    # ---Common parameters for both EEG and MEG---
 
     subjects_dir = config.get('subjects_dir', None)
     if subjects_dir:
@@ -177,12 +187,6 @@ with open(file_name, 'w') as f:
     interactive = config.get('interactive', False)
     f.write(f"interactive = {interactive}\n")
 
-    # Only for MEG studies
-    '''
-    process_empty_room = config.get('process_empty_room', False)
-    f.write(f"process_empty_room = {process_empty_room}\n")
-    '''
-
     process_rest = config.get('process_rest', False)
     f.write(f"process_rest = {process_rest}\n")
 
@@ -193,18 +197,6 @@ with open(file_name, 'w') as f:
     eog_channels = config.get('eog_channels', None)
     if eog_channels:
         f.write(f"eog_channels = {eog_channels}\n")
-
-    eeg_bipolar_channels = config.get('eeg_bipolar_channels', None)
-    if eeg_bipolar_channels:
-        f.write(f"eeg_bipolar_channels = {eeg_bipolar_channels}\n")
-    
-    eeg_reference = config.get('eeg_reference', 'average')
-    if eeg_reference:
-        f.write(f"eeg_reference = '{eeg_reference}'\n")
-
-    eeg_template_montage = config.get('eeg_template_montage', None)
-    if eeg_template_montage:
-        f.write(f"eeg_template_montage = '{eeg_template_montage}'\n")
 
     drop_channels = config.get('drop_channels', [])
     if drop_channels:
@@ -256,126 +248,6 @@ with open(file_name, 'w') as f:
         if t_break_annot_stop_before_next_event in [None, ""]:
             t_break_annot_stop_before_next_event = 5.0
         f.write(f"t_break_annot_stop_before_next_event = {t_break_annot_stop_before_next_event}\n")
-
-    # Bad channel detection for MEG
-    '''
-    find_flat_channels_meg = config.get('find_flat_channels_meg', False)
-    f.write(f"find_flat_channels_meg = {find_flat_channels_meg}\n")
-    
-    find_noisy_channels_meg = config.get('find_noisy_channels_meg', False)
-    f.write(f"find_noisy_channels_meg = {find_noisy_channels_meg}\n")
-    
-    find_bad_channels_extra_kws = config.get('find_bad_channels_extra_kws', {})
-    if find_bad_channels_extra_kws:
-        f.write(f"find_bad_channels_extra_kws = {find_bad_channels_extra_kws}\n")
-    '''
-
-    # Maxwell filter for MEG
-    '''
-    use_maxwell_filter = config.get('use_maxwell_filter', False)
-    f.write(f"use_maxwell_filter = {use_maxwell_filter}\n")
-    if use_maxwell_filter:
-        mf_st_duration = config.get('mf_st_duration')
-        if mf_st_duration in [None, ""]:
-            mf_st_duration = 10.0
-        f.write(f"mf_st_duration = {mf_st_duration}\n")
-            
-        mf_st_correlation = config.get('mf_st_correlation')
-        if mf_st_correlation in [None, ""]:
-            mf_st_correlation = 0.98
-        f.write(f"mf_st_correlation = {mf_st_correlation}\n")
-            
-        mf_head_origin = config.get('mf_head_origin', 'auto')
-        if mf_head_origin:
-            if isinstance(mf_head_origin, str):
-                f.write(f"mf_head_origin = '{mf_head_origin}'\n")
-            else:
-                f.write(f"mf_head_origin = {mf_head_origin}\n")
-                
-        mf_destination = config.get('mf_destination', 'reference_run')
-        if mf_destination:
-            if isinstance(mf_destination, str):
-                f.write(f"mf_destination = '{mf_destination}'\n")
-            else:
-                f.write(f"mf_destination = {mf_destination}\n")
-                
-        mf_int_order = config.get('mf_int_order')
-        if mf_int_order in [None, ""]:
-            mf_int_order = 8
-        f.write(f"mf_int_order = {mf_int_order}\n")
-            
-        mf_ext_order = config.get('mf_ext_order')
-        if mf_ext_order in [None, ""]:
-            mf_ext_order = 3
-        f.write(f"mf_ext_order = {mf_ext_order}\n")
-            
-        mf_reference_run = config.get('mf_reference_run', None)
-        if mf_reference_run:
-                f.write(f"mf_reference_run = '{mf_reference_run}'\n")
-
-        mf_reference_task = config.get('mf_reference_task', None)
-        if mf_reference_task:
-            f.write(f"mf_reference_task = '{mf_reference_task}'\n")
-            
-        mf_cal_fname = config.get('mf_cal_fname', None)
-        if mf_cal_fname:
-            f.write(f"mf_cal_fname = '{mf_cal_fname}'\n")
-            
-        mf_cal_missing = config.get('mf_cal_missing', 'raise')
-        if mf_cal_missing:
-            f.write(f"mf_cal_missing = '{mf_cal_missing}'\n")
-            
-        mf_ctc_fname = config.get('mf_ctc_fname', None)
-        if mf_ctc_fname:
-            f.write(f"mf_ctc_fname = '{mf_ctc_fname}'\n")
-            
-        mf_ctc_missing = config.get('mf_ctc_missing', 'raise')
-        if mf_ctc_missing:
-            f.write(f"mf_ctc_missing = '{mf_ctc_missing}'\n")
-            
-        mf_esss = config.get('mf_esss')
-        if mf_esss in [None, ""]:
-            mf_esss = 0
-        f.write(f"mf_esss = {mf_esss}\n")
-            
-        mf_esss_reject = config.get('mf_esss_reject', None)
-        if mf_esss_reject:
-            f.write(f"mf_esss_reject = {mf_esss_reject}\n")
-                
-        mf_mc = config.get('mf_mc', False)
-        f.write(f"mf_mc = {mf_mc}\n")
-
-        mf_mc_t_step_min = config.get('mf_mc_t_step_min')
-        if mf_mc_t_step_min in [None, ""]:
-            mf_mc_t_step_min = 0.01        
-        f.write(f"mf_mc_t_step_min = {mf_mc_t_step_min}\n")        
-
-        mf_mc_t_window = config.get('mf_mc_t_window', 'auto')
-        if mf_mc_t_window:
-            f.write(f"mf_mc_t_window = {mf_mc_t_window}\n")
-            
-        mf_mc_gof_limit = config.get('mf_mc_gof_limit')
-        if mf_mc_gof_limit in [None, ""]:
-            mf_mc_gof_limit = 0.98
-        f.write(f"mf_mc_gof_limit = {mf_mc_gof_limit}\n")
-            
-        mf_mc_dist_limit = config.get('mf_mc_dist_limit')
-        if mf_mc_dist_limit in [None, ""]:
-            mf_mc_dist_limit = 0.005
-        f.write(f"mf_mc_dist_limit = {mf_mc_dist_limit}\n")
-            
-        mf_mc_rotation_velocity_limit = config.get('mf_mc_rotation_velocity_limit', None)
-        if mf_mc_rotation_velocity_limit:
-            f.write(f"mf_mc_rotation_velocity_limit = {mf_mc_rotation_velocity_limit}\n")
-            
-        mf_filter_chpi = config.get('mf_filter_chpi', None)
-        if isinstance(mf_filter_chpi, bool):
-            f.write(f"mf_filter_chpi = {mf_filter_chpi}\n")
-        
-        mf_extra_kws = config.get('mf_extra_kws', {})
-        if mf_extra_kws:
-            f.write(f"mf_extra_kws = {mf_extra_kws}\n")
-    '''
 
     # Filtering and resampling
 
@@ -567,9 +439,6 @@ with open(file_name, 'w') as f:
         min_eog_epochs = 5
     f.write(f"min_eog_epochs = {min_eog_epochs}\n")
 
-    f.write("n_proj_eog = {'n_eeg': 1}\n")
-    f.write("n_proj_ecg = {'n_eeg': 1}\n")
-
     ecg_proj_from_average = config.get('ecg_proj_from_average', True)
     f.write(f"ecg_proj_from_average = {ecg_proj_from_average}\n")
 
@@ -688,6 +557,155 @@ with open(file_name, 'w') as f:
     autoreject_n_interpolate = config.get('autoreject_n_interpolate')
     if autoreject_n_interpolate:
         f.write(f"autoreject_n_interpolate = {autoreject_n_interpolate}\n")
+    
+    # ---Specific parameters according to the modality---
+
+    if data_type == 'eeg':
+
+        # --- exclusive parameters for EEG---
+
+        eeg_bipolar_channels = config.get('eeg_bipolar_channels', None)
+        if eeg_bipolar_channels:
+            f.write(f"eeg_bipolar_channels = {eeg_bipolar_channels}\n")
+    
+        eeg_reference = config.get('eeg_reference', 'average')
+        if eeg_reference:
+            f.write(f"eeg_reference = '{eeg_reference}'\n")
+
+        eeg_template_montage = config.get('eeg_template_montage', None)
+        if eeg_template_montage:
+            f.write(f"eeg_template_montage = '{eeg_template_montage}'\n")
+
+        # SSP projections for eog and ecg artifacts for EEG
+        f.write("n_proj_eog = {'n_eeg': 1}\n")
+        f.write("n_proj_ecg = {'n_eeg': 1}\n")
+
+    else:
+        # --- exclusive parameters for MEG---
+        process_empty_room = config.get('process_empty_room', False)
+        f.write(f"process_empty_room = {process_empty_room}\n")
+
+        # Bad channel detection for MEG
+
+        find_flat_channels_meg = config.get('find_flat_channels_meg', False)
+        f.write(f"find_flat_channels_meg = {find_flat_channels_meg}\n")
+        
+        find_noisy_channels_meg = config.get('find_noisy_channels_meg', False)
+        f.write(f"find_noisy_channels_meg = {find_noisy_channels_meg}\n")
+        
+        find_bad_channels_extra_kws = config.get('find_bad_channels_extra_kws', {})
+        if find_bad_channels_extra_kws:
+            f.write(f"find_bad_channels_extra_kws = {find_bad_channels_extra_kws}\n")
+
+        # Maxwell filter for MEG
+        
+        use_maxwell_filter = config.get('use_maxwell_filter', False)
+        f.write(f"use_maxwell_filter = {use_maxwell_filter}\n")
+        if use_maxwell_filter:
+            mf_st_duration = config.get('mf_st_duration')
+            if mf_st_duration in [None, ""]:
+                mf_st_duration = 10.0
+            f.write(f"mf_st_duration = {mf_st_duration}\n")
+                
+            mf_st_correlation = config.get('mf_st_correlation')
+            if mf_st_correlation in [None, ""]:
+                mf_st_correlation = 0.98
+            f.write(f"mf_st_correlation = {mf_st_correlation}\n")
+                
+            mf_head_origin = config.get('mf_head_origin', 'auto')
+            if mf_head_origin:
+                if isinstance(mf_head_origin, str):
+                    f.write(f"mf_head_origin = '{mf_head_origin}'\n")
+                else:
+                    f.write(f"mf_head_origin = {mf_head_origin}\n")
+                    
+            mf_destination = config.get('mf_destination', 'reference_run')
+            if mf_destination:
+                if isinstance(mf_destination, str):
+                    f.write(f"mf_destination = '{mf_destination}'\n")
+                else:
+                    f.write(f"mf_destination = {mf_destination}\n")
+                    
+            mf_int_order = config.get('mf_int_order')
+            if mf_int_order in [None, ""]:
+                mf_int_order = 8
+            f.write(f"mf_int_order = {mf_int_order}\n")
+                
+            mf_ext_order = config.get('mf_ext_order')
+            if mf_ext_order in [None, ""]:
+                mf_ext_order = 3
+            f.write(f"mf_ext_order = {mf_ext_order}\n")
+                
+            mf_reference_run = config.get('mf_reference_run', None)
+            if mf_reference_run:
+                    f.write(f"mf_reference_run = '{mf_reference_run}'\n")
+
+            mf_reference_task = config.get('mf_reference_task', None)
+            if mf_reference_task:
+                f.write(f"mf_reference_task = '{mf_reference_task}'\n")
+                
+            mf_cal_fname = config.get('mf_cal_fname', None)
+            if mf_cal_fname:
+                f.write(f"mf_cal_fname = '{mf_cal_fname}'\n")
+                
+            mf_cal_missing = config.get('mf_cal_missing', 'raise')
+            if mf_cal_missing:
+                f.write(f"mf_cal_missing = '{mf_cal_missing}'\n")
+                
+            mf_ctc_fname = config.get('mf_ctc_fname', None)
+            if mf_ctc_fname:
+                f.write(f"mf_ctc_fname = '{mf_ctc_fname}'\n")
+                
+            mf_ctc_missing = config.get('mf_ctc_missing', 'raise')
+            if mf_ctc_missing:
+                f.write(f"mf_ctc_missing = '{mf_ctc_missing}'\n")
+                
+            mf_esss = config.get('mf_esss')
+            if mf_esss in [None, ""]:
+                mf_esss = 0
+            f.write(f"mf_esss = {mf_esss}\n")
+                
+            mf_esss_reject = config.get('mf_esss_reject', None)
+            if mf_esss_reject:
+                f.write(f"mf_esss_reject = {mf_esss_reject}\n")
+                    
+            mf_mc = config.get('mf_mc', False)
+            f.write(f"mf_mc = {mf_mc}\n")
+
+            mf_mc_t_step_min = config.get('mf_mc_t_step_min')
+            if mf_mc_t_step_min in [None, ""]:
+                mf_mc_t_step_min = 0.01        
+            f.write(f"mf_mc_t_step_min = {mf_mc_t_step_min}\n")        
+
+            mf_mc_t_window = config.get('mf_mc_t_window', 'auto')
+            if mf_mc_t_window:
+                f.write(f"mf_mc_t_window = {mf_mc_t_window}\n")
+                
+            mf_mc_gof_limit = config.get('mf_mc_gof_limit')
+            if mf_mc_gof_limit in [None, ""]:
+                mf_mc_gof_limit = 0.98
+            f.write(f"mf_mc_gof_limit = {mf_mc_gof_limit}\n")
+                
+            mf_mc_dist_limit = config.get('mf_mc_dist_limit')
+            if mf_mc_dist_limit in [None, ""]:
+                mf_mc_dist_limit = 0.005
+            f.write(f"mf_mc_dist_limit = {mf_mc_dist_limit}\n")
+                
+            mf_mc_rotation_velocity_limit = config.get('mf_mc_rotation_velocity_limit', None)
+            if mf_mc_rotation_velocity_limit:
+                f.write(f"mf_mc_rotation_velocity_limit = {mf_mc_rotation_velocity_limit}\n")
+                
+            mf_filter_chpi = config.get('mf_filter_chpi', None)
+            if isinstance(mf_filter_chpi, bool):
+                f.write(f"mf_filter_chpi = {mf_filter_chpi}\n")
+            
+            mf_extra_kws = config.get('mf_extra_kws', {})
+            if mf_extra_kws:
+                f.write(f"mf_extra_kws = {mf_extra_kws}\n")
+    
+        # SSP projections for eog and ecg artifacts for MEG
+        f.write("n_proj_eog = {'n_mag': 1, 'n_grad': 1}\n")
+        f.write("n_proj_ecg = {'n_mag': 1, 'n_grad': 1}\n")
 
 # Run python script
 

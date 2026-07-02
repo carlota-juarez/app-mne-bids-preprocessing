@@ -1,7 +1,8 @@
 {
-  "edf": "archivo_prueba.edf",
+  "input": "archivo_prueba",
   "task": "01",
-  "data_type": "eeg",
+  "data_type": "",
+  "ch_type": "",
   "subjects_dir": null,
   "task_is_rest": false,
   "interactive": false,
